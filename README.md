@@ -35,7 +35,7 @@ Python is required,`gpuview` has been tested with both 2.7 and 3 versions.
 Install directly from repo:
 
 ```
-$ pip install git+https://github.com/XinNoil/gpuview
+$ pip install git+https://github.com/XinNoil/gpuview.git@main
 ```
 
 > `gpuview` installs the latest version of `gpustat` from `pypi`, therefore, its commands are available 
