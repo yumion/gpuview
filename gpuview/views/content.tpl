@@ -1,5 +1,5 @@
     <div class="content-wrapper" id="gpu-content">
-        <div class="container-fluid" style="padding: 90px 40px 40px 40px">
+        <div class="container-fluid" style="padding: 100px 40px 40px 40px">
             <form onsubmit="return handleData()" method="get" action="host_display" style="display: flex" id="hosts_form">
             % for host in hosts:
             <div style="margin-right:8px">

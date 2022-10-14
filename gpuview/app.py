@@ -10,9 +10,8 @@ Web API of gpuview.
 import os
 import json
 from datetime import datetime
-import pdb
 
-from bottle import Bottle, TEMPLATE_PATH, template, response, request, redirect
+from bottle import Bottle, TEMPLATE_PATH, template, response, request, redirect, static_file
 
 from . import utils
 from . import core
@@ -76,6 +75,11 @@ def host_display():
     now = datetime.now().strftime('Updated at %Y-%m-%d %H-%M-%S')
     # return template('index', hosts=hosts, gpustats=gpustats, update_time=now)
     redirect('/')
+
+@app.route("/static/img/<filepath:re:.*\.(jpg|png|gif|ico|svg)>")
+def img(filepath):
+    print(filepath)
+    return static_file(filepath, root=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'img'))
 
 def main():
     parser = utils.arg_parser()

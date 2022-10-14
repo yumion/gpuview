@@ -13,10 +13,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" 
         rel="stylesheet" type="text/css"/>
     <link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css" rel="stylesheet"/>
+    <link rel="shortcut icon" href="/static/img/vga-card.png" type="image/x-icon" />
 </head>
 
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+        <img src="/static/img/vga-card.png" width="32" height="32" style="padding: 4px 4px 4px 4px">
         <a class="navbar-brand" href="">gpuview dashboard</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" 
             data-target="#navbarResponsive"
@@ -36,7 +38,7 @@
         <input type="text" id="timeValue" value="0" style="color: red; font-size: 45px; border: none; background: transparent; outline: none; width: 200px; text-align: center;" readonly>
     </nav>
     <div class="content-wrapper" id="gpu-content">
-        <div class="container-fluid" style="padding: 90px 40px 40px 40px">
+        <div class="container-fluid" style="padding: 100px 40px 40px 40px">
             <form onsubmit="return handleData()" method="get" action="host_display" style="display: flex" id="hosts_form">
             % for host in hosts:
             <div style="margin-right:8px">
