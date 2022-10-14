@@ -12,17 +12,20 @@ try:
     from urllib.request import urlopen
 except ImportError:
     from urllib2 import urlopen
+from .utils import str2bool
+from pymemcache.client import base
 
 
 ABS_PATH = os.path.dirname(os.path.realpath(__file__))
 HOSTS_DB = os.path.join(ABS_PATH, 'gpuhosts.db')
 SAFE_ZONE = False  # Safe to report all details.
+DISPLAY = True
 
+client = base.Client(('127.0.0.1', 11211))
 
 def safe_zone(safe=False):
     global SAFE_ZONE
     SAFE_ZONE = safe
-
 
 def my_gpustat():
     """
@@ -41,6 +44,8 @@ def my_gpustat():
         stat = GPUStatCollection.new_query().jsonify()
         delete_list = []
         for gpu_id, gpu in enumerate(stat['gpus']):
+            if gpu['processes'] is None:
+                gpu['processes'] = []
             if type(gpu['processes']) is str:
                 delete_list.append(gpu_id)
                 continue
@@ -65,23 +70,32 @@ def my_gpustat():
                 gpu.pop("query_time", None)
 
             gpu['flag'] = 'bg-primary'
-            if gpu['temperature.gpu'] > 75:
+            if gpu['memory'] > 75:
                 gpu['flag'] = 'bg-danger'
-            elif gpu['temperature.gpu'] > 50:
+            elif gpu['memory'] > 50:
                 gpu['flag'] = 'bg-warning'
-            elif gpu['temperature.gpu'] > 25:
+            elif gpu['memory'] > 10:
                 gpu['flag'] = 'bg-success'
 
         if delete_list:
             for gpu_id in delete_list:
                 stat['gpus'].pop(gpu_id)
-
         return stat
     except Exception as e:
         return {'error': '%s!' % getattr(e, 'message', str(e))}
 
+def reset_flag(gpustat):
+    for gpu_id, gpu in enumerate(gpustat['gpus']):
+        gpu['flag'] = 'bg-primary'
+        if gpu['memory'] > 75:
+            gpu['flag'] = 'bg-danger'
+        elif gpu['memory'] > 50:
+            gpu['flag'] = 'bg-warning'
+        elif gpu['memory'] > 10:
+            gpu['flag'] = 'bg-success'
 
-def all_gpustats():
+
+def all_gpustats(hosts=None):
     """
     Aggregates the gpustats of all registered hosts and this host.
 
@@ -91,31 +105,31 @@ def all_gpustats():
 
     gpustats = []
     mystat = my_gpustat()
-    if 'gpus' in mystat:
+    if 'gpus' in mystat and DISPLAY:
         gpustats.append(mystat)
-
-    hosts = load_hosts()
-    for url in hosts:
-        try:
-            raw_resp = urlopen(url + '/gpustat')
-            gpustat = json.loads(raw_resp.read())
-            raw_resp.close()
-            if not gpustat or 'gpus' not in gpustat:
+    hosts = load_hosts() if hosts is None else hosts
+    for host in hosts:
+        if not host['display']:
+            continue
+        gpustat = client.get(host['name']) 
+        if gpustat is None:
+            try:
+                raw_resp = urlopen(host['url'] + '/gpustat')
+                gpustat = json.loads(raw_resp.read())
+                reset_flag(gpustat)
+                raw_resp.close()
+                if not gpustat or 'gpus' not in gpustat:
+                    continue
+                client.set(host['name'], json.dumps(gpustat), 4)
+            except Exception as e:
+                print('Error: %s getting gpustat from %s' %
+                    (getattr(e, 'message', str(e)), host['url']))
                 continue
-            if hosts[url] != url:
-                gpustat['hostname'] = hosts[url]
-            gpustats.append(gpustat)
-        except Exception as e:
-            print('Error: %s getting gpustat from %s' %
-                  (getattr(e, 'message', str(e)), url))
-
-    try:
-        sorted_gpustats = sorted(gpustats, key=lambda g: g['hostname'])
-        if sorted_gpustats is not None:
-            return sorted_gpustats
-    except Exception as e:
-        print("Error: %s" % getattr(e, 'message', str(e)))
-    return gpustats
+        else:
+            gpustat = json.loads(gpustat.decode())
+        gpustat['hostname'] = host['name']
+        gpustats.append(gpustat)
+    return hosts, gpustats
 
 
 def load_hosts():
@@ -123,18 +137,18 @@ def load_hosts():
     Loads the list of registered gpu nodes from file.
 
     Returns:
-        dict: {url: name, ... }
+        dict list: [{'name':name, 'url':url, 'display': display}, ... ]
     """
 
-    hosts = {}
+    hosts = []
     if not os.path.exists(HOSTS_DB):
         print("There are no registered hosts! Use `gpuview add` first.")
         return hosts
 
     for line in open(HOSTS_DB, 'r'):
         try:
-            name, url = line.strip().split('\t')
-            hosts[url] = name
+            name, url, display = line.strip().split(',')
+            hosts.append({'name':name, 'url':url, 'display':str2bool(display)})
         except Exception as e:
             print('Error: %s loading host: %s!' %
                   (getattr(e, 'message', str(e)), line))
@@ -143,36 +157,38 @@ def load_hosts():
 
 def save_hosts(hosts):
     with open(HOSTS_DB, 'w') as f:
-        for url in hosts:
-            f.write('%s\t%s\n' % (hosts[url], url))
+        for host in hosts:
+            f.write('%s,%s,%s\n' % (host['name'], host['url'], host['display']))
 
 
-def add_host(url, name=None):
-    url = url.strip().strip('/')
+def add_host(url, name=None, display=True):
+    url = url.strip().strip('/').replace(',','')
     if name is None:
         name = url
+    name = name.replace(',','')
     hosts = load_hosts()
-    hosts[url] = name
+    hosts.append({'name':name, 'url':url, 'display':display})
     save_hosts(hosts)
     print('Successfully added host!')
 
 
-def remove_host(url):
+def remove_host(name):
     hosts = load_hosts()
-    if hosts.pop(url, None):
+    names = [host['name'] for host in hosts]
+    if hosts.pop(names.index(name), None):
         save_hosts(hosts)
-        print("Removed host: %s!" % url)
+        print("Removed host: %s!" % name)
     else:
-        print("Couldn't find host: %s!" % url)
+        print("Couldn't find host: %s!" % name)
 
 
 def print_hosts():
     hosts = load_hosts()
     if len(hosts):
-        hosts = sorted(hosts.items(), key=lambda g: g[1])
-        print('#   Name\tURL')
+        # hosts = sorted(hosts.items(), key=lambda g: g[1])
+        print('#   Name\tURL\tDISPLAY')
         for idx, host in enumerate(hosts):
-            print('%02d. %s\t%s' % (idx+1, host[1], host[0]))
+            print('%02d. %s\t%s\t%s' % (idx+1, host['name'], host['url'], host['display']))
 
 
 def install_service(host=None, port=None,

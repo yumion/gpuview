@@ -10,8 +10,9 @@ Web API of gpuview.
 import os
 import json
 from datetime import datetime
+import pdb
 
-from bottle import Bottle, TEMPLATE_PATH, template, response
+from bottle import Bottle, TEMPLATE_PATH, template, response, request, redirect
 
 from . import utils
 from . import core
@@ -24,13 +25,23 @@ TEMPLATE_PATH.insert(0, abs_views_path)
 
 EXCLUDE_SELF = False  # Do not report to `/gpustat` calls.
 
-
 @app.route('/')
 def index():
-    gpustats = core.all_gpustats()
+    hosts, gpustats = core.all_gpustats()
     now = datetime.now().strftime('Updated at %Y-%m-%d %H-%M-%S')
-    return template('index', gpustats=gpustats, update_time=now)
+    return template('index', hosts=hosts, gpustats=gpustats, update_time=now)
 
+@app.route('/content', methods=['GET'])
+def index():
+    hosts = core.load_hosts()
+    for host in hosts:
+        if host['name'] not in request.GET:
+            host['display'] = False
+        else:
+            host['display'] = True
+    hosts, gpustats = core.all_gpustats(hosts)
+    now = datetime.now().strftime('Updated at %Y-%m-%d %H-%M-%S')
+    return template('content', hosts=hosts, gpustats=gpustats, update_time=now)
 
 @app.route('/gpustat', methods=['GET'])
 def report_gpustat():
@@ -52,6 +63,19 @@ def report_gpustat():
         resp = core.my_gpustat()
     return json.dumps(resp, default=_date_handler)
 
+@app.route('/host_display', methods=['GET'])
+def host_display():
+    hosts = core.load_hosts()
+    for host in hosts:
+        if host['name'] not in request.GET:
+            host['display'] = False
+        else:
+            host['display'] = True
+    hosts, gpustats = core.all_gpustats(hosts)
+    core.save_hosts(hosts)
+    now = datetime.now().strftime('Updated at %Y-%m-%d %H-%M-%S')
+    # return template('index', hosts=hosts, gpustats=gpustats, update_time=now)
+    redirect('/')
 
 def main():
     parser = utils.arg_parser()
@@ -70,7 +94,7 @@ def main():
     elif 'add' == args.action:
         core.add_host(args.url, args.name)
     elif 'remove' == args.action:
-        core.remove_host(args.url)
+        core.remove_host(args.name)
     elif 'hosts' == args.action:
         core.print_hosts()
     else:

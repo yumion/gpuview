@@ -52,7 +52,7 @@ def arg_parser():
 
     add_parser = subparsers.add_parser("add", help="Register a new GPU host")
     add_parser.add_argument('--url', required=True,
-                            help="URL of GPU host (IP:Port, eg. X.X.X.X:9988")
+                            help="URL of GPU host (IP:Port, eg. http://X.X.X.X:9988")
     add_parser.add_argument('--name', default=None,
                             help="An optional readable name for the GPU host")
 
@@ -66,3 +66,11 @@ def arg_parser():
                           help="Install gpuview as a service")
 
     return parser
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Unsupported value encountered.')

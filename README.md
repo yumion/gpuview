@@ -1,10 +1,10 @@
-gpuview
+gpuview-enhanced
 =======
 
 [![LICENSE](https://img.shields.io/github/license/fgaim/gpuview.svg)](https://github.com/fgaim/gpuview/blob/master/LICENSE)
-![GitHub issues](https://img.shields.io/github/issues/fgaim/gpuview.svg)
-[![PyPI](https://img.shields.io/pypi/v/gpuview.svg)](https://pypi.org/project/gpuview/)
 [![CircleCI](https://circleci.com/gh/fgaim/gpuview.svg?style=shield)](https://circleci.com/gh/fgaim/gpuview)
+<!-- ![GitHub issues](https://img.shields.io/github/issues/fgaim/gpuview.svg)
+[![PyPI](https://img.shields.io/pypi/v/gpuview.svg)](https://pypi.org/project/gpuview/) -->
 
 
 GPU is an expensive resource, and deep learning practitioners have to monitor the
@@ -14,13 +14,17 @@ Often times, however, it is not convenient to `ssh` into servers to just check t
 `gpuview` is meant to mitigate this by running a lightweight web dashboard on top of 
 [`gpustat`][repo_gpustat].  
 
-With `gpuview` one can monitor GPUs on the go, though a web browser. Moreover, **multiple GPU servers** 
-can be registered into one `gpuview` dashboard and all stats are aggregated and accessible from one place.
+With `gpuview` one can monitor GPUs on the go, though a web browser. Moreover, **multiple GPU servers** can be registered into one `gpuview` dashboard and all stats are aggregated and accessible from one place.
 
 
 Thumbnail view of GPUs across multiple servers.  
 
-![Screenshot of gpuview](https://github.com/fgaim/gpuview/blob/master/imgs/dash-1.png)
+**!New Features in this fork:**
+1. Select and save the multiple GPU servers for display
+2. Memory cache for multiple GPU servers
+3. Page auto refresh with a indicator of time to stale
+
+![Screenshot of gpuview](https://github.com/XinNoil/gpuview/blob/main/imgs/dash-1.png)
 
 
 Setup
@@ -28,22 +32,21 @@ Setup
 
 Python is required,`gpuview` has been tested with both 2.7 and 3 versions.
 
-Install from [PyPI][pypi_gpuview]:
+Install directly from repo:
 
 ```
-$ pip install gpuview
-```
-
-[or] Install directly from repo:
-
-```
-$ pip install git+https://github.com/fgaim/gpuview.git@master
+$ pip install git+https://github.com/XinNoil/gpuview
 ```
 
 > `gpuview` installs the latest version of `gpustat` from `pypi`, therefore, its commands are available 
 from the terminal.
 
+Dependendencies
+---------------
 
+```
+$ sudo apt-get install memcached
+```
 
 Usage
 -----
@@ -87,10 +90,10 @@ $ gpuview -h
   * `--exclude-self`   : Don't report to others but to self-dashboard
   * `-d`, `--debug`    : Run server in debug mode (for developers)
 * `add`                : Add a GPU host to dashboard
-  * `--url`            : URL of host [IP:Port], eg. X.X.X.X:9988
+  * `--url`            : URL of host [IP:Port], eg. http://<hostname:port>
   * `--name`           : Optional readable name for the host, eg. Node101
 * `remove`             : Remove a registered host from dashboard
-  * `--url`            : URL of host to remove, eg. X.X.X.X:9988
+  * `--url`            : URL of host to remove, eg. http://<hostname:port>
 * `hosts`              : Print out all registered hosts
 * `service`            : Install `gpuview` as system service
   * `--host`           : URL or IP address of host (default: 0.0.0.0)
@@ -107,12 +110,12 @@ To aggregate the stats of multiple machines, they can be registered to one dashb
 
 Register a host to monitor as follows:
 ```
-$ gpuview add --url <ip:port> --name <name>
+$ gpuview add --url http://<hostname:port> --name <name>
 ```
 
 Remove a registered host as follows:
 ```
-$ gpuview remove --url <ip:port> --name <name>
+$ gpuview remove --name <name>
 ```
 
 Display all registered hosts as follows:
@@ -141,7 +144,7 @@ The `--exclude-self` option of the run command can be used to prevent other dash
 
 Detailed view of GPUs across multiple servers.  
 
-![Screenshot of gpuview](https://github.com/fgaim/gpuview/blob/master/imgs/dash-2.png)
+![Screenshot of gpuview](https://github.com/XinNoil/gpuview/blob/main/imgs/dash-2.png)
 
 
 License
