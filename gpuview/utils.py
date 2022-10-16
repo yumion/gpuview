@@ -57,8 +57,8 @@ def arg_parser():
                             help="An optional readable name for the GPU host")
 
     rem_parser = subparsers.add_parser("remove", help="Remove a GPU host")
-    rem_parser.add_argument('--url', required=True,
-                            help="Url of the GPU node to remove")
+    rem_parser.add_argument('--name', required=True,
+                            help="An optional readable name for the GPU host")
 
     subparsers.add_parser("hosts", help="Print all GPU hosts")
 
