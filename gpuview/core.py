@@ -19,7 +19,6 @@ from pymemcache.client import base
 ABS_PATH = os.path.dirname(os.path.realpath(__file__))
 HOSTS_DB = os.path.join(ABS_PATH, 'gpuhosts.db')
 SAFE_ZONE = False  # Safe to report all details.
-DISPLAY = True
 
 client = base.Client(('127.0.0.1', 11211))
 
@@ -80,6 +79,7 @@ def my_gpustat():
         if delete_list:
             for gpu_id in delete_list:
                 stat['gpus'].pop(gpu_id)
+        stat['display'] = True
         return stat
     except Exception as e:
         return {'error': '%s!' % getattr(e, 'message', str(e))}
@@ -95,7 +95,7 @@ def reset_flag(gpustat):
             gpu['flag'] = 'bg-success'
 
 
-def all_gpustats(hosts=None):
+def all_gpustats(hosts=None, ttl=4):
     """
     Aggregates the gpustats of all registered hosts and this host.
 
@@ -105,12 +105,10 @@ def all_gpustats(hosts=None):
 
     gpustats = []
     mystat = my_gpustat()
-    if 'gpus' in mystat and DISPLAY:
+    if 'gpus' in mystat:
         gpustats.append(mystat)
     hosts = load_hosts() if hosts is None else hosts
     for host in hosts:
-        if not host['display']:
-            continue
         gpustat = client.get(host['name']) 
         if gpustat is None:
             try:
@@ -118,9 +116,9 @@ def all_gpustats(hosts=None):
                 gpustat = json.loads(raw_resp.read())
                 reset_flag(gpustat)
                 raw_resp.close()
+                client.set(host['name'], json.dumps(gpustat), ttl)
                 if not gpustat or 'gpus' not in gpustat:
                     continue
-                client.set(host['name'], json.dumps(gpustat), 4)
             except Exception as e:
                 print('Error: %s getting gpustat from %s' %
                     (getattr(e, 'message', str(e)), host['url']))
@@ -128,6 +126,7 @@ def all_gpustats(hosts=None):
         else:
             gpustat = json.loads(gpustat.decode())
         gpustat['hostname'] = host['name']
+        gpustat['display'] = host['display']
         gpustats.append(gpustat)
     return hosts, gpustats
 

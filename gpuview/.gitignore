@@ -1,2 +1,3 @@
 *.pyc
 gpuhosts.db
+nohup.out

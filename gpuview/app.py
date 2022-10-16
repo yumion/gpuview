@@ -70,16 +70,18 @@ def host_display():
             host['display'] = False
         else:
             host['display'] = True
-    hosts, gpustats = core.all_gpustats(hosts)
+    hosts, _ = core.all_gpustats(hosts)
     core.save_hosts(hosts)
-    now = datetime.now().strftime('Updated at %Y-%m-%d %H-%M-%S')
-    # return template('index', hosts=hosts, gpustats=gpustats, update_time=now)
     redirect('/')
 
 @app.route("/static/img/<filepath:re:.*\.(jpg|png|gif|ico|svg)>")
 def img(filepath):
     print(filepath)
     return static_file(filepath, root=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'img'))
+
+@app.get("/static/css/<filepath:re:.*\.css>")
+def css(filepath):
+    return static_file(filepath, root=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'css'))
 
 def main():
     parser = utils.arg_parser()
