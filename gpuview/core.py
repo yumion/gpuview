@@ -113,7 +113,10 @@ def all_gpustats(hosts=None, ttl=4):
         if gpustat is None:
             try:
                 raw_resp = urlopen(host['url'] + '/gpustat')
-                gpustat = json.loads(raw_resp.read())
+                resp = raw_resp.read()
+                if type(resp) != str:
+                    resp = resp.decode()
+                gpustat = json.loads(resp)
                 reset_flag(gpustat)
                 raw_resp.close()
                 client.set(host['name'], json.dumps(gpustat), ttl)

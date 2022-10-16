@@ -16,7 +16,10 @@ def get_gpustats(ttl):
     for host in hosts:
         try:
             raw_resp = urlopen(host['url'] + '/gpustat')
-            gpustat = json.loads(raw_resp.read())
+            resp = raw_resp.read()
+            if type(resp) != str:
+                resp = resp.decode()
+            gpustat = json.loads(resp)
             reset_flag(gpustat)
             raw_resp.close()
             if not gpustat or 'gpus' not in gpustat:
