@@ -1,4 +1,5 @@
 include README.md
 include gpuview/views/*
-include gpuview/static/*
+include gpuview/static/css/*
+include gpuview/static/img/*
 include gpuview/service.sh
