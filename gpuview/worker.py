@@ -1,47 +1,11 @@
-import time, json, json
-from gpuview.core import load_hosts, reset_flag, client
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
+import time, json
+from gpuview.core import load_hosts, reset_flag, req_host
 
-def get_gpustats(ttl, retry=3, timeout=3):
-    """
-    Aggregates the gpustats of all registered hosts and this host.
-
-    Returns:
-        list: pustats of hosts
-    """
+def get_gpustats(ttl, retry, timeout):
     hosts = load_hosts()
-    for i in range(retry):
-        hosts = req_hosts(hosts, ttl, timeout)
-        if not len(hosts):
-            break
-    return
-
-def req_hosts(hosts, ttl, timeout):
-    timeout_hosts = []
     for host in hosts:
-        if not req_host(host, ttl, timeout):
-            timeout_hosts.append(host)
-    return timeout_hosts
-
-def req_host(host, ttl, timeout):
-    try:
-        raw_resp = urlopen(host['url'] + '/gpustat', timeout = timeout)
-        resp = raw_resp.read()
-        if type(resp) != str:
-            resp = resp.decode()
-        gpustat = json.loads(resp)
-        reset_flag(gpustat)
-        raw_resp.close()
-        if gpustat is not None and 'gpus' in gpustat:
-            client.set(host['name'], json.dumps(gpustat), ttl)
-        return True
-    except Exception as e:
-        print('Error: %s getting gpustat from %s' %
-            (getattr(e, 'message', str(e)), host['url']))
-        return False
+        req_host(host, ttl, retry, timeout)
+    return
 
 def main():
     while True:

@@ -95,7 +95,7 @@ def reset_flag(gpustat):
             gpu['flag'] = 'bg-success'
 
 
-def all_gpustats(hosts=None, ttl=4):
+def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
     """
     Aggregates the gpustats of all registered hosts and this host.
 
@@ -111,14 +111,31 @@ def all_gpustats(hosts=None, ttl=4):
     for host in hosts:
         gpustat = client.get(host['name']) 
         if gpustat is None:
-            print('None gpustat from %s' %(host['url']))
-            continue
+            req_host(host, ttl, retry, timeout)
         else:
             gpustat = json.loads(gpustat.decode())
         gpustat['hostname'] = host['name']
         gpustat['display'] = host['display']
         gpustats.append(gpustat)
     return hosts, gpustats
+
+def req_host(host, ttl, retry, timeout):
+    for i in range(retry):
+        try:
+            raw_resp = urlopen(host['url'] + '/gpustat', timeout = timeout)
+            resp = raw_resp.read()
+            if type(resp) != str:
+                resp = resp.decode()
+            gpustat = json.loads(resp)
+            reset_flag(gpustat)
+            raw_resp.close()
+            if gpustat is not None and 'gpus' in gpustat:
+                client.set(host['name'], json.dumps(gpustat), ttl)
+            return True
+        except Exception as e:
+            print('Error: %s getting gpustat from %s' %
+                (getattr(e, 'message', str(e)), host['url']))
+    return False
 
 
 def load_hosts():
