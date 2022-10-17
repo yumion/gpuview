@@ -5,7 +5,7 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-def get_gpustats(ttl, retry=3):
+def get_gpustats(ttl, retry=3, timeout=3):
     """
     Aggregates the gpustats of all registered hosts and this host.
 
@@ -14,21 +14,21 @@ def get_gpustats(ttl, retry=3):
     """
     hosts = load_hosts()
     for i in range(retry):
-        hosts = req_hosts(hosts, ttl)
+        hosts = req_hosts(hosts, ttl, timeout)
         if not len(hosts):
             break
     return
 
-def req_hosts(hosts, ttl):
+def req_hosts(hosts, ttl, timeout):
     timeout_hosts = []
     for host in hosts:
-        if not req_host(host, ttl):
+        if not req_host(host, ttl, timeout):
             timeout_hosts.append(host)
     return timeout_hosts
 
-def req_host(host, ttl):
+def req_host(host, ttl, timeout):
     try:
-        raw_resp = urlopen(host['url'] + '/gpustat', timeout = 1)
+        raw_resp = urlopen(host['url'] + '/gpustat', timeout = timeout)
         resp = raw_resp.read()
         if type(resp) != str:
             resp = resp.decode()
@@ -45,7 +45,7 @@ def req_host(host, ttl):
 
 def main():
     while True:
-        get_gpustats(16)
+        get_gpustats(20, 3, 3)
         time.sleep(8)
 
 if __name__ == '__main__':
