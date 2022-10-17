@@ -5,7 +5,7 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-def get_gpustats(ttl):
+def get_gpustats(ttl, retry=3):
     """
     Aggregates the gpustats of all registered hosts and this host.
 
@@ -13,9 +13,17 @@ def get_gpustats(ttl):
         list: pustats of hosts
     """
     hosts = load_hosts()
+    for i in range(retry):
+        hosts = req_hosts(hosts, ttl)
+        if not len(hosts):
+            break
+    return
+
+def req_hosts(hosts, ttl):
+    timeout_hosts = []
     for host in hosts:
         try:
-            raw_resp = urlopen(host['url'] + '/gpustat')
+            raw_resp = urlopen(host['url'] + '/gpustat', timeout = 1)
             resp = raw_resp.read()
             if type(resp) != str:
                 resp = resp.decode()
@@ -25,13 +33,12 @@ def get_gpustats(ttl):
             if not gpustat or 'gpus' not in gpustat:
                 continue
             client.set(host['name'], json.dumps(gpustat), ttl)
-            gpustat['hostname'] = host['name']
         except Exception as e:
             print('Error: %s getting gpustat from %s' %
                 (getattr(e, 'message', str(e)), host['url']))
+            timeout_hosts.append(host)
             continue
-    # print('set ok')
-    return
+    return timeout_hosts
 
 def main():
     while True:

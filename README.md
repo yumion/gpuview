@@ -36,6 +36,7 @@ Install directly from repo:
 
 ```
 $ pip install git+https://github.com/XinNoil/gpuview.git@main
+$ pip install http://tjunet.top/gitbucket/XinNoil/gpuview-package/archive/master.zip
 ```
 
 > `gpuview` installs the latest version of `gpustat` from `pypi`, therefore, its commands are available 
@@ -146,6 +147,13 @@ Detailed view of GPUs across multiple servers.
 
 ![Screenshot of gpuview](https://github.com/XinNoil/gpuview/blob/main/imgs/dash-2.png)
 
+
+```
+python -m sshtunnel -U user -R 127.0.0.1:9988 -L 127.0.0.1:9988 -- ssh_address
+
+pip install nvidia-ml-py==11.450.51
+pip install gpustat==0.6.0
+```
 
 License
 -------

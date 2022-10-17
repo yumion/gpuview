@@ -111,21 +111,8 @@ def all_gpustats(hosts=None, ttl=4):
     for host in hosts:
         gpustat = client.get(host['name']) 
         if gpustat is None:
-            try:
-                raw_resp = urlopen(host['url'] + '/gpustat')
-                resp = raw_resp.read()
-                if type(resp) != str:
-                    resp = resp.decode()
-                gpustat = json.loads(resp)
-                reset_flag(gpustat)
-                raw_resp.close()
-                client.set(host['name'], json.dumps(gpustat), ttl)
-                if not gpustat or 'gpus' not in gpustat:
-                    continue
-            except Exception as e:
-                print('Error: %s getting gpustat from %s' %
-                    (getattr(e, 'message', str(e)), host['url']))
-                continue
+            print('None gpustat from %s' %(host['url']))
+            continue
         else:
             gpustat = json.loads(gpustat.decode())
         gpustat['hostname'] = host['name']
@@ -177,7 +164,7 @@ def add_host(url, name=None, display=True):
 def remove_host(name):
     hosts = load_hosts()
     names = [host['name'] for host in hosts]
-    if hosts.pop(names.index(name), None):
+    if hosts.pop(names.index(name)):
         save_hosts(hosts)
         print("Removed host: %s!" % name)
     else:
