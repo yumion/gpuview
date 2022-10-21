@@ -111,12 +111,13 @@ def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
     for host in hosts:
         gpustat = client.get(host['name']) 
         if gpustat is None:
-            req_host(host, ttl, retry, timeout)
+            gpustat = req_host(host, ttl, retry, timeout)
         else:
             gpustat = json.loads(gpustat.decode())
-        gpustat['hostname'] = host['name']
-        gpustat['display'] = host['display']
-        gpustats.append(gpustat)
+        if gpustat is not None:
+            gpustat['hostname'] = host['name']
+            gpustat['display'] = host['display']
+            gpustats.append(gpustat)
     return hosts, gpustats
 
 def req_host(host, ttl, retry, timeout):
@@ -131,11 +132,11 @@ def req_host(host, ttl, retry, timeout):
             raw_resp.close()
             if gpustat is not None and 'gpus' in gpustat:
                 client.set(host['name'], json.dumps(gpustat), ttl)
-            return True
+            return gpustat
         except Exception as e:
             print('Error: %s getting gpustat from %s' %
                 (getattr(e, 'message', str(e)), host['url']))
-    return False
+    return None
 
 
 def load_hosts():
