@@ -109,15 +109,16 @@ def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
         gpustats.append(mystat)
     hosts = load_hosts() if hosts is None else hosts
     for host in hosts:
-        gpustat = client.get(host['name']) 
-        if gpustat is None:
-            gpustat = req_host(host, ttl, retry, timeout)
-        else:
-            gpustat = json.loads(gpustat.decode())
-        if gpustat is not None:
-            gpustat['hostname'] = host['name']
-            gpustat['display'] = host['display']
-            gpustats.append(gpustat)
+        if host['display']:
+            gpustat = client.get(host['name']) 
+            if gpustat is None:
+                gpustat = req_host(host, ttl, retry, timeout)
+            else:
+                gpustat = json.loads(gpustat.decode())
+            if gpustat is not None:
+                gpustat['hostname'] = host['name']
+                gpustat['display'] = host['display']
+                gpustats.append(gpustat)
     return hosts, gpustats
 
 def req_host(host, ttl, retry, timeout):
