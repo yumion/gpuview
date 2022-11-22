@@ -3,18 +3,18 @@
                         <div class="card-body">
                             <div class="float-left">
                                 <div class="card-body-icon">
-                                    <i class="fa fa-server"></i> <b>{{ gpustat.get('hostname', '-') }} [{{ gpu.get('index', '') }}] {{ gpu.get('name', '-') }}</b>
+                                    <i class="fa fa-server"></i> <b>{{ gpustat.get('hostname', '-') }} [{{ gpu.get('index', '') }}] {{ gpu.get('name', '-').replace('NVIDIA GeForce ','') }}</b>
                                 </div>
                                 <div>
                                     <span class="float-left">
                                         <span class="text-nowrap">
                                         <i class="fa fa-thermometer-three-quarters" aria-hidden="true"></i>
                                         Temp. {{ gpu.get('temperature.gpu', '-') }}&#8451; 
-                                        </span> |
+                                        </span>|
                                         <span class="text-nowrap">
                                         <i class="fa fa-microchip" aria-hidden="true"></i>
                                         Mem. {{ gpu.get('memory', '-') }}% 
-                                        </span> |
+                                        </span>|
                                         <span class="text-nowrap">
                                         <i class="fa fa-cogs" aria-hidden="true"></i>
                                         Util. {{ gpu.get('utilization.gpu', '-') }}%
