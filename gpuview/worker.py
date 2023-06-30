@@ -1,5 +1,8 @@
-import time, json
-from gpuview.core import load_hosts, reset_flag, req_host
+import json
+import time
+
+from gpuview.core import load_hosts, req_host, reset_flag
+
 
 def get_gpustats(ttl, retry, timeout):
     hosts = load_hosts()
@@ -7,10 +10,12 @@ def get_gpustats(ttl, retry, timeout):
         req_host(host, ttl, retry, timeout)
     return
 
+
 def main():
     while True:
         get_gpustats(20, 3, 3)
         time.sleep(8)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
