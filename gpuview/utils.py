@@ -51,6 +51,7 @@ def arg_parser():
     base_parser.add_argument(
         "--safe-zone",
         action="store_true",
+        default=True,
         help="Report all details including usernames",
     )
     base_parser.add_argument(
