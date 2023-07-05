@@ -18,6 +18,8 @@
     <link rel="shortcut icon" href="/static/img/vga-card.png" type="image/x-icon" />
 </head>
 
+% from gpuview import core
+
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav" style="padding-top:40px">
         <img src="/static/img/vga-card.png" width="32" height="32" style="margin-left: 20px;margin-right: 10px;">

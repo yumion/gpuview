@@ -75,7 +75,8 @@
         <span class="close">&times;</span>
         <h2>Cancel Reservation</h2>
         <p id="reservationInfo"></p>
-        <form id="cancelForm">
+        <form id="cancelForm" action="/cancel" method="post">
+            <input type="hidden" name="gpuId" id="gpuId">
             <input type="submit" value="Submit">
         </form>
     </div>
@@ -90,15 +91,19 @@
     const reservationInfo = document.getElementById("reservationInfo");
 
     function openModal(element) {
-        if (element.classList.contains("bg-primary")) {
-            reservationModal.style.display = "block";
-        } else if (element.classList.contains("bg-danger")) {
-            cancelModal.style.display = "block";
-        }
-        // クリックしたカードのGPU IDをformに埋め込む
-        const gpuIdInputEl = reservationModal.querySelector("#gpuId");
-        gpuIdInputEl.setAttribute("value", element.id);
         console.log(element.id);
+        // クリックしたカードのGPU IDをformに埋め込む
+        if (element.classList.contains("bg-primary")) {
+            // 予約する時
+            reservationModal.style.display = "block";
+            const gpuIdInputEl = reservationModal.querySelector("#gpuId");
+            gpuIdInputEl.setAttribute("value", element.id);
+        } else if (element.classList.contains("bg-danger")) {
+            // キャンセルする時
+            cancelModal.style.display = "block";
+            const gpuIdInputEl = cancelModal.querySelector("#gpuId");
+            gpuIdInputEl.setAttribute("value", element.id);
+        }
     }
 
     // // 予約モーダル内のフォームの送信イベントリスナー

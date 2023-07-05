@@ -255,3 +255,20 @@ def who_reserved_gpu(gpu_name):
     for book in booklist:
         if book["gpuid"] == gpu_name:
             return book["username"]
+    return ""
+
+
+def when_finish_reserve(gpu_name):
+    booklist = get_reservation_status()
+    for book in booklist:
+        if book["gpuid"] == gpu_name:
+            return book["usagetime"]
+    return ""
+
+
+def is_reserved(gpu_name):
+    booklist = get_reservation_status()
+    for book in booklist:
+        if book["gpuid"] == gpu_name:
+            return "bg-danger"
+    return "bg-primary"

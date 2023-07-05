@@ -1,13 +1,16 @@
+% gpu_id = f"{gpustat.get('hostname')}_GPU{gpu.get('index')}"
 <div class="col-xl-3 col-md-4 col-sm-6 mb-3 card-block {{gpustat['hostname']}}"
-    style="display:{{ 'none' if not gpustat.get('display') else 'grid'}}">
-    <div class="card text-white {{ gpu.get('flag', '') }} o-hidden h-100"
-        id="{{gpustat.get('hostname')}}_GPU{{gpu.get('index')}}" onclick="openModal(this)">
+    style="display:{{ 'none' if not gpustat.get('display') else 'grid' }}">
+    <div class="card text-white {{ core.is_reserved(gpu_id) }} o-hidden h-100" id="{{gpu_id}}"
+        onclick="openModal(this)">
         <div class="card-header text-white clearfix z-1">
             <span class="float-left">
                 <i class="fa fa-user" aria-hidden="true"></i>
-            </span>|
+                {{ core.who_reserved_gpu(gpu_id) }}
+            </span>
             <span class="float-right">
                 <i class="fa fa-calendar" aria-hidden="true"></i>
+                {{ core.when_finish_reserve(gpu_id) }}
             </span>
         </div>
         <div class="card-body">

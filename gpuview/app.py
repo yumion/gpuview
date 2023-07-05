@@ -71,8 +71,14 @@ def reserve_gpu():
     username = request.forms.get("username")
     usagetime = request.forms.get("usagetime")  # [hour]
     gpu_id = request.forms.get("gpuId")
-    print(username, usagetime, gpu_id)
     core.add_gpu(gpu_id, username, usagetime)
+    redirect("/")
+
+
+@app.route("/cancel", method=["POST"])
+def cancel_gpu():
+    gpu_id = request.forms.get("gpuId")
+    core.cancel_gpu(gpu_id)
     redirect("/")
 
 
