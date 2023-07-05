@@ -20,6 +20,7 @@ from .utils import str2bool
 
 ABS_PATH = os.path.dirname(os.path.realpath(__file__))
 HOSTS_DB = os.path.join(ABS_PATH, "gpuhosts.db")
+RESERVATION_DB = os.path.join(ABS_PATH, "reservation_list.db")
 SAFE_ZONE = False  # Safe to report all details.
 
 client = base.Client(("127.0.0.1", 11211))
@@ -53,14 +54,11 @@ def my_gpustat():
             if type(gpu["processes"]) is str:
                 delete_list.append(gpu_id)
                 continue
-            gpu["memory"] = round(
-                float(gpu["memory.used"]) / float(gpu["memory.total"]) * 100
-            )
+            gpu["memory"] = round(float(gpu["memory.used"]) / float(gpu["memory.total"]) * 100)
             if SAFE_ZONE:
                 gpu["users"] = len(set([p["username"] for p in gpu["processes"]]))
                 user_process = [
-                    "%s(%s,%sM)" % (p["username"], p["command"], p["gpu_memory_usage"])
-                    for p in gpu["processes"]
+                    "%s(%s,%sM)" % (p["username"], p["command"], p["gpu_memory_usage"]) for p in gpu["processes"]
                 ]
                 gpu["user_processes"] = " ".join(user_process)
             else:
@@ -140,10 +138,7 @@ def req_host(host, ttl, retry, timeout):
                 client.set(host["name"], json.dumps(gpustat), ttl)
             return gpustat
         except Exception as e:
-            print(
-                "Error: %s getting gpustat from %s"
-                % (getattr(e, "message", str(e)), host["url"])
-            )
+            print("Error: %s getting gpustat from %s" % (getattr(e, "message", str(e)), host["url"]))
     return None
 
 
@@ -170,9 +165,9 @@ def load_hosts():
 
 
 def save_hosts(hosts):
-    with open(HOSTS_DB, "w") as f:
+    with open(HOSTS_DB, "w") as fw:
         for host in hosts:
-            f.write("%s,%s,%s\n" % (host["name"], host["url"], host["display"]))
+            fw.write("%s,%s,%s\n" % (host["name"], host["url"], host["display"]))
 
 
 def add_host(url, name=None, display=True):
@@ -202,10 +197,7 @@ def print_hosts():
         # hosts = sorted(hosts.items(), key=lambda g: g[1])
         print("#   Name\tURL\tDISPLAY")
         for idx, host in enumerate(hosts):
-            print(
-                "%02d. %s\t%s\t%s"
-                % (idx + 1, host["name"], host["url"], host["display"])
-            )
+            print("%02d. %s\t%s\t%s" % (idx + 1, host["name"], host["url"], host["display"]))
 
 
 def install_service(host=None, port=None, safe_zone=False, exclude_self=False):
@@ -220,3 +212,46 @@ def install_service(host=None, port=None, safe_zone=False, exclude_self=False):
         arg += "--exclude-self "
     script = os.path.join(ABS_PATH, "service.sh")
     subprocess.call('{} "{}"'.format(script, arg.strip()), shell=True)
+
+
+def get_reservation_status():
+    booklist = []
+    if not os.path.exists(RESERVATION_DB):
+        return booklist
+
+    for line in open(RESERVATION_DB, "r"):
+        try:
+            gpuid, username, usagetime = line.strip().split(",")
+            booklist.append({"gpuid": gpuid, "username": username, "usagetime": usagetime})
+        except Exception as e:
+            print("Error: %s loading host: %s!" % (getattr(e, "message", str(e)), line))
+    return booklist
+
+
+def save_gpu_booklist(booklist):
+    with open(RESERVATION_DB, "w") as fw:
+        for book in booklist:
+            fw.write(f"{book['gpuid']},{book['username']},{book['usagetime']}\n")
+
+
+def add_gpu(gpuid, username, usagetime):
+    booklist = get_reservation_status()
+    booklist.append({"gpuid": gpuid, "username": username, "usagetime": usagetime})
+    save_gpu_booklist(booklist)
+
+
+def cancel_gpu(gpu_name):
+    booklist = get_reservation_status()
+    names = [book["gpuid"] for book in booklist]
+    if booklist.pop(names.index(gpu_name)):
+        save_gpu_booklist(booklist)
+        print(f"Cancel GPU: {gpu_name}")
+    else:
+        print(f"The GPU {gpu_name} is already cancelled")
+
+
+def who_reserved_gpu(gpu_name):
+    booklist = get_reservation_status()
+    for book in booklist:
+        if book["gpuid"] == gpu_name:
+            return book["username"]

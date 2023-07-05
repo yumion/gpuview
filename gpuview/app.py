@@ -26,8 +26,9 @@ EXCLUDE_SELF = False  # Do not report to `/gpustat` calls.
 @app.route("/")
 def index():
     hosts, gpustats = core.all_gpustats()
+    booklist = core.get_reservation_status()
     now = datetime.now().strftime("Updated at %Y/%m/%d %H:%M:%S")
-    return template("index", hosts=hosts, gpustats=gpustats, update_time=now)
+    return template("index", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=now)
 
 
 @app.route("/content", methods=["GET"])
@@ -39,8 +40,9 @@ def _index():
         else:
             host["display"] = True
     hosts, gpustats = core.all_gpustats(hosts)
+    booklist = core.get_reservation_status()
     now = datetime.now().strftime("Updated at %Y/%m/%d %H:%M:%S")
-    return template("content", hosts=hosts, gpustats=gpustats, update_time=now)
+    return template("content", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=now)
 
 
 @app.route("/gpustat", methods=["GET"])
@@ -62,6 +64,16 @@ def report_gpustat():
     else:
         resp = core.my_gpustat()
     return json.dumps(resp, default=_date_handler)
+
+
+@app.route("/reserve", method=["POST"])
+def reserve_gpu():
+    username = request.forms.get("username")
+    usagetime = request.forms.get("usagetime")  # [hour]
+    gpu_id = request.forms.get("gpuId")
+    print(username, usagetime, gpu_id)
+    core.add_gpu(gpu_id, username, usagetime)
+    redirect("/")
 
 
 @app.route("/host_display", methods=["GET"])

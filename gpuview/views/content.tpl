@@ -58,12 +58,12 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Make a Reservation</h2>
-        <form id="reservationForm">
+        <form id="reservationForm" action="/reserve" method="post">
             <label for="username">Username:</label>
-            <input type="text" id="username" required><br><br>
+            <input type="text" name="username" id="username" required><br><br>
             <label for="usagetime">Usage Time:</label>
-            <input type="number" id="usagetime" required value="24">hours<br><br>
-            <input type="hidden" id="gpuId">
+            <input type="number" name="usagetime" id="usagetime" required value="24">hours<br><br>
+            <input type="hidden" name="gpuId" id="gpuId">
             <input type="submit" value="Submit">
         </form>
     </div>
@@ -90,50 +90,58 @@
     const reservationInfo = document.getElementById("reservationInfo");
 
     function openModal(element) {
-        console.log(element.id);
-        const gpuIdInputEl = reservationForm.querySelector("#gpuId");
-        gpuIdInputEl.setAttribute("value", element.id);
-
         if (element.classList.contains("bg-primary")) {
             reservationModal.style.display = "block";
         } else if (element.classList.contains("bg-danger")) {
             cancelModal.style.display = "block";
         }
+        // クリックしたカードのGPU IDをformに埋め込む
+        const gpuIdInputEl = reservationModal.querySelector("#gpuId");
+        gpuIdInputEl.setAttribute("value", element.id);
+        console.log(element.id);
     }
 
-    // 予約モーダル内のフォームの送信イベントリスナー
-    reservationForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // フォームのデフォルトの送信をキャンセル
-        // フォームの入力値を取得
-        const username = reservationForm.querySelector("#username").value;
-        const usagetime = reservationForm.querySelector("#usagetime").value;
-        const gpuId = reservationForm.querySelector("#gpuId").value;
-        // 選択したカードを取得
-        const gpuCard = document.getElementById(gpuId)
-        // 予約情報の表示
-        reservationInfo.textContent = "Username: " + username + ", Usage Time: " + usagetime;
-        // モーダルを閉じる
-        reservationModal.style.display = "none";
-        // 予約ボタンをキャンセルボタンに変更
-        gpuCard.classList.remove("bg-primary");
-        gpuCard.classList.add("bg-danger");
-    });
+    // // 予約モーダル内のフォームの送信イベントリスナー
+    // reservationForm.addEventListener("submit", function (event) {
+    //     event.preventDefault(); // フォームのデフォルトの送信をキャンセル
+    //     // フォームの入力値を取得
+    //     const username = reservationForm.querySelector("#username").value;
+    //     const usagetime = reservationForm.querySelector("#usagetime").value;
+    //     const gpuId = reservationForm.querySelector("#gpuId").value;
+    //     // 選択したカードを取得
+    //     const gpuCard = document.getElementById(gpuId);
+    //     // モーダルを閉じる
+    //     reservationModal.style.display = "none";
+    //     // フォームをリセット
+    //     reservationForm.reset();
+    //     // TODO:DBからDBから取ってくるようにして後で消す
+    //     // 予約ボタンをキャンセルボタンに変更
+    //     gpuCard.classList.remove("bg-primary");
+    //     gpuCard.classList.add("bg-danger");
+    //     // 予約情報の表示
+    //     reservationInfo.textContent = "Username: " + username + ", Usage Time: " + usagetime;
+    //     // 改めてsubmit
+    //     reservationForm.submit();
+    // });
 
-    // キャンセルモーダルのフォームの送信イベントリスナー
-    cancelForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // フォームのデフォルトの送信をキャンセル
-        // フォームの入力値を取得
-        const gpuId = reservationForm.querySelector("#gpuId").value;
-        // 選択したカードを取得
-        const gpuCard = document.getElementById(gpuId)
-        // 予約情報をリセット
-        reservationInfo.textContent = "";
-        // モーダルを閉じる
-        cancelModal.style.display = "none";
-        // 予約ボタンを予約モードに変更
-        gpuCard.classList.remove("bg-danger");
-        gpuCard.classList.add("bg-primary");
-    });
+    // // キャンセルモーダルのフォームの送信イベントリスナー
+    // cancelForm.addEventListener("submit", function (event) {
+    //     // event.preventDefault(); // フォームのデフォルトの送信をキャンセル
+    //     // フォームの入力値を取得
+    //     const gpuId = reservationForm.querySelector("#gpuId").value;
+    //     // 選択したカードを取得
+    //     const gpuCard = document.getElementById(gpuId);
+    //     // モーダルを閉じる
+    //     cancelModal.style.display = "none";
+    //     // TODO:DBからDBから取ってくるようにして後で消す
+    //     // 予約ボタンを予約モードに変更
+    //     gpuCard.classList.remove("bg-danger");
+    //     gpuCard.classList.add("bg-primary");
+    //     // 予約情報をリセット
+    //     reservationInfo.textContent = "";
+    //     // 改めてsubmit
+    //     reservationForm.submit();
+    // });
 
     // Close Reservation Modal
     reservationModal.querySelector(".close").addEventListener("click", () => {
