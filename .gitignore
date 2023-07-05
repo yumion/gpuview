@@ -7,6 +7,6 @@ build/
 tmp/
 *.egg-info/
 gpuhosts.db
-reservation_list.db.db
+reservation_list.db
 gpuview.log
 pypi.sh
