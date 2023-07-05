@@ -18,18 +18,22 @@
   0% {
     -webkit-transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(360deg);
   }
 }
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
+
 /* Add animation to "page content" */
 .animate-bottom {
   position: relative;
@@ -44,21 +48,25 @@
     bottom: -100px;
     opacity: 0;
   }
+
   to {
     bottom: 0px;
     opacity: 1;
   }
 }
+
 @keyframes animatebottom {
   from {
     bottom: -100px;
     opacity: 0;
   }
+
   to {
     bottom: 0;
     opacity: 1;
   }
 }
+
 #myDiv {
   display: none;
   text-align: center;
@@ -98,15 +106,19 @@ strong {
   transition: all 20ms ease-out;
   vertical-align: top;
 }
-.button:hover, .button:focus {
+
+.button:hover,
+.button:focus {
   background: hsl(0deg, 0%, 95%);
   border-color: hsl(0deg, 0%, 55%);
   box-shadow: inset 0 1px 0 hsl(0deg, 67.7419354839%, 100%), inset 0 -1px 0 hsl(0deg, 0%, 85%), inset 0 0 0 1px hsl(0deg, 0%, 95%);
 }
+
 .button:active {
   background: hsl(0deg, 0%, 95%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button .fa {
   color: hsl(0deg, 0%, 75%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -120,15 +132,19 @@ strong {
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.button-blue:hover, .button-blue:focus {
+
+.button-blue:hover,
+.button-blue:focus {
   background: hsl(199deg, 76.6181315762%, 52.955%);
   border-color: hsl(199deg, 100%, 21.805%);
   box-shadow: inset 0 1px 0 hsl(199deg, 96.1897504287%, 73.755%), inset 0 -1px 0 hsl(199deg, 68.0672268908%, 47.005%), inset 0 0 0 1px hsl(199deg, 71.1626687639%, 61.855%);
 }
+
 .button-blue:active {
   background: hsl(199deg, 76.6181315762%, 52.955%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button-blue .fa {
   color: hsl(199deg, 83.4862385321%, 37.605%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -142,15 +158,19 @@ strong {
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.button-green:hover, .button-green:focus {
+
+.button-green:hover,
+.button-green:focus {
   background: hsl(97deg, 50.9803921569%, 59.2%);
   border-color: hsl(97deg, 69.4915254237%, 23.6%);
   box-shadow: inset 0 1px 0 hsl(97deg, 49.7487437186%, 80.1%), inset 0 -1px 0 hsl(97deg, 37.7593360996%, 51.8%), inset 0 0 0 1px hsl(97deg, 39.0243902439%, 67.2%);
 }
+
 .button-green:active {
   background: hsl(97deg, 50.9803921569%, 59.2%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button-green .fa {
   color: hsl(97deg, 44.9275362319%, 41.4%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -164,15 +184,19 @@ strong {
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.button-purple:hover, .button-purple:focus {
+
+.button-purple:hover,
+.button-purple:focus {
   background: hsl(249deg, 37.2967951695%, 56.94%);
   border-color: hsl(249deg, 58.7301587302%, 20.79%);
   box-shadow: inset 0 1px 0 hsl(249deg, 25.4712845243%, 77.19%), inset 0 -1px 0 hsl(249deg, 28.2051282051%, 49.14%), inset 0 0 0 1px hsl(249deg, 24.4966442953%, 64.24%);
 }
+
 .button-purple:active {
   background: hsl(249deg, 37.2967951695%, 56.94%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button-purple .fa {
   color: hsl(249deg, 36.9863013699%, 38.69%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -186,15 +210,19 @@ strong {
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.button-orange:hover, .button-orange:focus {
+
+.button-orange:hover,
+.button-orange:focus {
   background: hsl(26deg, 91.2587412587%, 54.24%);
   border-color: hsl(26deg, 100%, 23.24%);
   box-shadow: inset 0 1px 0 hsl(26deg, 100%, 75.79%), inset 0 -1px 0 hsl(26deg, 76.9911504425%, 48.59%), inset 0 0 0 1px hsl(26deg, 88.9380530973%, 63.84%);
 }
+
 .button-orange:active {
   background: hsl(26deg, 91.2587412587%, 54.24%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button-orange .fa {
   color: hsl(26deg, 94.1747572816%, 39.14%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -208,15 +236,19 @@ strong {
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.button-red:hover, .button-red:focus {
+
+.button-red:hover,
+.button-red:focus {
   background: hsl(4deg, 81.8746763335%, 61.38%);
   border-color: hsl(4deg, 96.0784313725%, 27.03%);
   box-shadow: inset 0 1px 0 hsl(4deg, 100%, 83.43%), inset 0 -1px 0 hsl(4deg, 62.4060150376%, 54.78%), inset 0 0 0 1px hsl(4deg, 76.1255115962%, 70.68%);
 }
+
 .button-red:active {
   background: hsl(4deg, 81.8746763335%, 61.38%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button-red .fa {
   color: hsl(4deg, 63.9344262295%, 44.53%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -230,15 +262,19 @@ strong {
   color: hsl(49deg, 88.679245283%, 31.27%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-.button-yellow:hover, .button-yellow:focus {
+
+.button-yellow:hover,
+.button-yellow:focus {
   background: hsl(49deg, 96.9400244798%, 67.32%);
   border-color: hsl(49deg, 88.679245283%, 31.27%);
   box-shadow: inset 0 1px 0 hsl(49deg, 100%, 90.47%), inset 0 -1px 0 hsl(49deg, 72.1377912867%, 60.52%), inset 0 0 0 1px hsl(49deg, 95.6101843723%, 77.22%);
 }
+
 .button-yellow:active {
   background: hsl(49deg, 96.9400244798%, 67.32%);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
 }
+
 .button-yellow .fa {
   color: hsl(49deg, 58.7301587302%, 49.77%);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -250,4 +286,46 @@ strong {
   line-height: 20px;
   margin: -1px 8px 0 -4px;
   vertical-align: top;
-}/*# sourceMappingURL=my.css.map */
+}
+
+/*# sourceMappingURL=my.css.map */
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#cancelModal {
+  display: none;
+}

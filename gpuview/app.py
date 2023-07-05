@@ -26,7 +26,7 @@ EXCLUDE_SELF = False  # Do not report to `/gpustat` calls.
 @app.route("/")
 def index():
     hosts, gpustats = core.all_gpustats()
-    now = datetime.now().strftime("Updated at %Y-%m-%d %H-%M-%S")
+    now = datetime.now().strftime("Updated at %Y/%m/%d %H:%M:%S")
     return template("index", hosts=hosts, gpustats=gpustats, update_time=now)
 
 
@@ -39,7 +39,7 @@ def _index():
         else:
             host["display"] = True
     hosts, gpustats = core.all_gpustats(hosts)
-    now = datetime.now().strftime("Updated at %Y-%m-%d %H-%M-%S")
+    now = datetime.now().strftime("Updated at %Y/%m/%d %H:%M:%S")
     return template("content", hosts=hosts, gpustats=gpustats, update_time=now)
 
 

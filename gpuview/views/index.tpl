@@ -21,14 +21,12 @@
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav" style="padding-top:40px">
         <img src="/static/img/vga-card.png" width="32" height="32" style="margin-left: 20px;margin-right: 10px;">
-        <a class="navbar-brand" href="">gpuview dashboard</a>
+        <a class="navbar-brand" href="">GPU Management Board</a>
         <div style="margin-top:20px">
             <div class="wrapper" style="padding-left:20px">
                 <label style="color:white;margin-right:12px"> Load: </label>
-                <div class="box bg-primary"></div> <label style="color:white"> Empty </label>
-                <div class="box bg-success"></div> <label style="color:white"> Low </label>
-                <div class="box bg-warning"></div> <label style="color:white"> Middle </label>
-                <div class="box bg-danger"></div> <label style="color:white"> High </label>
+                <div class="box bg-primary"></div> <label style="color:white"> Vacant </label>
+                <div class="box bg-danger"></div> <label style="color:white"> Occupied </label>
             </div>
             <form onsubmit="return handleData()" method="get" action="host_display" id="hosts_form"
                 style="display: flex; padding-left:20px">
@@ -58,6 +56,13 @@
         style="display:none; color: red; font-size: 45px; border: none; background: transparent; outline: none; width: 200px; text-align: center;"
         readonly>
     %include('content.tpl')
+    <footer class="sticky-footer">
+        <div class="container">
+            <div class="text-center text-white">
+                <small><a href='https://github.com/yumion/gpuview'>gpuview</a> © 2023</small>
+            </div>
+        </div>
+    </footer>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
@@ -68,7 +73,7 @@
     <script>
         var auto_clock;
         var is_checkbox_change;
-        auto_clock = setInterval(refresh, 5000);
+        auto_clock = setInterval(refresh, 1000000);
         is_checkbox_change = false;
 
         function refresh() {

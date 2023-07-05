@@ -1,5 +1,6 @@
 <div class="content-wrapper" id="gpu-content">
     <div class="container-fluid" style="padding: 200px 40px 40px 40px">
+        <!-- GPU status card -->
         <div class="row">
             % for gpustat in gpustats:
             % for gpu in gpustat.get('gpus', []):
@@ -7,14 +8,147 @@
             % end
             % end
         </div>
-        <!--
-            <footer class="sticky-footer">
-                <div class="container">
-                    <div class="text-center text-white">
-                        <small><a href='https://github.com/fgaim/gpuview'>gpuview</a> © 2022</small>
-                    </div>
+
+        <!-- List of GPU process -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fa fa-table"></i> All Hosts and GPUs
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Host</th>
+                                <th scope="col">GPU</th>
+                                <th scope="col">Temp.</th>
+                                <th scope="col">Util.</th>
+                                <th scope="col">Memory Use/Cap</th>
+                                <th scope="col">Power Use/Cap</th>
+                                <th scope="col">User Processes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            % for gpustat in gpustats:
+                            % for gpu in gpustat.get('gpus', []):
+                            <tr class="small" id={{ gpustat.get('hostname', '-' ) }}>
+                                <th scope="row">{{ gpustat.get('hostname', '-') }} </th>
+                                <td> [{{ gpu.get('index', '') }}] {{ gpu.get('name', '-') }} </td>
+                                <td> {{ gpu.get('temperature.gpu', '-') }}&#8451; </td>
+                                <td> {{ gpu.get('utilization.gpu', '-') }}% </td>
+                                <td> {{ gpu.get('memory', '-') }}%
+                                    ({{ gpu.get('memory.used', '') }}/{{ gpu.get('memory.total', '-') }}) </td>
+                                <td> {{ gpu.get('power.draw', '-') }} / {{ gpu.get('enforced.power.limit', '-') }} W
+                                </td>
+                                <td> {{ gpu.get('user_processes', '-') }} </td>
+                            </tr>
+                            % end
+                            % end
+                        </tbody>
+                    </table>
                 </div>
-            </footer>
-            -->
+            </div>
+            <div class="card-footer small text-muted">{{ update_time }}</div>
+        </div>
     </div>
 </div>
+
+<!-- 予約モーダル -->
+<div id="reservationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Make a Reservation</h2>
+        <form id="reservationForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required><br><br>
+            <label for="usagetime">Usage Time:</label>
+            <input type="number" id="usagetime" required value="24">hours<br><br>
+            <input type="hidden" id="gpuId">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+<!-- キャンセルモーダル -->
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Cancel Reservation</h2>
+        <p id="reservationInfo"></p>
+        <form id="cancelForm">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+<script>
+    // 予約ボタンとモーダルの要素を取得
+    const reservationModal = document.getElementById("reservationModal");
+    const reservationForm = document.getElementById("reservationForm");
+    const cancelModal = document.getElementById("cancelModal");
+    const cancelForm = document.getElementById("cancelForm");
+    const reservationInfo = document.getElementById("reservationInfo");
+
+    function openModal(element) {
+        console.log(element.id);
+        const gpuIdInputEl = reservationForm.querySelector("#gpuId");
+        gpuIdInputEl.setAttribute("value", element.id);
+
+        if (element.classList.contains("bg-primary")) {
+            reservationModal.style.display = "block";
+        } else if (element.classList.contains("bg-danger")) {
+            cancelModal.style.display = "block";
+        }
+    }
+
+    // 予約モーダル内のフォームの送信イベントリスナー
+    reservationForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // フォームのデフォルトの送信をキャンセル
+        // フォームの入力値を取得
+        const username = reservationForm.querySelector("#username").value;
+        const usagetime = reservationForm.querySelector("#usagetime").value;
+        const gpuId = reservationForm.querySelector("#gpuId").value;
+        // 選択したカードを取得
+        const gpuCard = document.getElementById(gpuId)
+        // 予約情報の表示
+        reservationInfo.textContent = "Username: " + username + ", Usage Time: " + usagetime;
+        // モーダルを閉じる
+        reservationModal.style.display = "none";
+        // 予約ボタンをキャンセルボタンに変更
+        gpuCard.classList.remove("bg-primary");
+        gpuCard.classList.add("bg-danger");
+    });
+
+    // キャンセルモーダルのフォームの送信イベントリスナー
+    cancelForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // フォームのデフォルトの送信をキャンセル
+        // フォームの入力値を取得
+        const gpuId = reservationForm.querySelector("#gpuId").value;
+        // 選択したカードを取得
+        const gpuCard = document.getElementById(gpuId)
+        // 予約情報をリセット
+        reservationInfo.textContent = "";
+        // モーダルを閉じる
+        cancelModal.style.display = "none";
+        // 予約ボタンを予約モードに変更
+        gpuCard.classList.remove("bg-danger");
+        gpuCard.classList.add("bg-primary");
+    });
+
+    // Close Reservation Modal
+    reservationModal.querySelector(".close").addEventListener("click", () => {
+        reservationModal.style.display = "none";
+    });
+    // Close Cancel Modal
+    cancelModal.querySelector(".close").addEventListener("click", () => {
+        cancelModal.style.display = "none";
+    });
+    // モーダル外をクリックしてモーダルを閉じる
+    window.addEventListener("click", (event) => {
+        if (event.target == reservationModal) {
+            reservationModal.style.display = "none";
+        } else if (event.target == cancelModal) {
+            cancelModal.style.display = "none";
+        }
+    });
+</script>

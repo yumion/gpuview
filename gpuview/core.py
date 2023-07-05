@@ -72,12 +72,12 @@ def my_gpustat():
                 gpu.pop("query_time", None)
 
             gpu["flag"] = "bg-primary"
-            if gpu["memory"] > 75:
-                gpu["flag"] = "bg-danger"
-            elif gpu["memory"] > 50:
-                gpu["flag"] = "bg-warning"
-            elif gpu["memory"] > 10:
-                gpu["flag"] = "bg-success"
+            # if gpu["memory"] > 75:
+            #     gpu["flag"] = "bg-danger"
+            # elif gpu["memory"] > 50:
+            #     gpu["flag"] = "bg-warning"
+            # elif gpu["memory"] > 10:
+            #     gpu["flag"] = "bg-success"
 
         if delete_list:
             for gpu_id in delete_list:
@@ -134,7 +134,7 @@ def req_host(host, ttl, retry, timeout):
             if type(resp) != str:
                 resp = resp.decode()
             gpustat = json.loads(resp)
-            reset_flag(gpustat)
+            # reset_flag(gpustat)
             raw_resp.close()
             if gpustat is not None and "gpus" in gpustat:
                 client.set(host["name"], json.dumps(gpustat), ttl)
