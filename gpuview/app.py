@@ -9,7 +9,7 @@ Web API of gpuview.
 
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bottle import TEMPLATE_PATH, Bottle, redirect, request, response, static_file, template
 
@@ -27,8 +27,12 @@ EXCLUDE_SELF = False  # Do not report to `/gpustat` calls.
 def index():
     hosts, gpustats = core.all_gpustats()
     booklist = core.get_reservation_status()
-    now = datetime.now().strftime("Updated at %Y/%m/%d %H:%M:%S")
-    return template("index", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=now)
+    now = datetime.now()
+    is_time_over_gpus = core.check_deadline(now)
+    for gpuid in is_time_over_gpus:
+        core.cancel_gpu(gpuid)
+    timestamp = now.strftime("Updated at %Y/%m/%d %H:%M:%S")
+    return template("index", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=timestamp)
 
 
 @app.route("/content", methods=["GET"])
@@ -41,8 +45,12 @@ def _index():
             host["display"] = True
     hosts, gpustats = core.all_gpustats(hosts)
     booklist = core.get_reservation_status()
-    now = datetime.now().strftime("Updated at %Y/%m/%d %H:%M:%S")
-    return template("content", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=now)
+    now = datetime.now()
+    is_time_over_gpus = core.check_deadline(now)
+    for gpuid in is_time_over_gpus:
+        core.cancel_gpu(gpuid)
+    timestamp = now.strftime("Updated at %Y/%m/%d %H:%M:%S")
+    return template("content", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=timestamp)
 
 
 @app.route("/gpustat", methods=["GET"])
@@ -70,8 +78,10 @@ def report_gpustat():
 def reserve_gpu():
     username = request.forms.get("username")
     usagetime = request.forms.get("usagetime")  # [hour]
+    finish_time = datetime.now() + timedelta(hours=int(usagetime))
+    finish_time = finish_time.strftime("%m/%d %H:%M")
     gpu_id = request.forms.get("gpuId")
-    core.add_gpu(gpu_id, username, usagetime)
+    core.add_gpu(gpu_id, username, finish_time)
     redirect("/")
 
 

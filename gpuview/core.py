@@ -7,6 +7,7 @@ Core functions of gpuview.
 
 import json
 import os
+from datetime import datetime
 import subprocess
 
 try:
@@ -221,8 +222,8 @@ def get_reservation_status():
 
     for line in open(RESERVATION_DB, "r"):
         try:
-            gpuid, username, usagetime = line.strip().split(",")
-            booklist.append({"gpuid": gpuid, "username": username, "usagetime": usagetime})
+            gpuid, username, finishtime = line.strip().split(",")
+            booklist.append({"gpuid": gpuid, "username": username, "finishtime": finishtime})
         except Exception as e:
             print("Error: %s loading host: %s!" % (getattr(e, "message", str(e)), line))
     return booklist
@@ -231,44 +232,55 @@ def get_reservation_status():
 def save_gpu_booklist(booklist):
     with open(RESERVATION_DB, "w") as fw:
         for book in booklist:
-            fw.write(f"{book['gpuid']},{book['username']},{book['usagetime']}\n")
+            fw.write(f"{book['gpuid']},{book['username']},{book['finishtime']}\n")
 
 
-def add_gpu(gpuid, username, usagetime):
+def add_gpu(gpuid, username, finishtime):
     booklist = get_reservation_status()
-    booklist.append({"gpuid": gpuid, "username": username, "usagetime": usagetime})
+    booklist.append({"gpuid": gpuid, "username": username, "finishtime": finishtime})
     save_gpu_booklist(booklist)
 
 
-def cancel_gpu(gpu_name):
+def cancel_gpu(gpuid):
     booklist = get_reservation_status()
     names = [book["gpuid"] for book in booklist]
-    if booklist.pop(names.index(gpu_name)):
+    if booklist.pop(names.index(gpuid)):
         save_gpu_booklist(booklist)
-        print(f"Cancel GPU: {gpu_name}")
+        print(f"Cancel GPU: {gpuid}")
     else:
-        print(f"The GPU {gpu_name} is already cancelled")
+        print(f"The GPU {gpuid} is already cancelled")
 
 
-def who_reserved_gpu(gpu_name):
+def who_reserved_gpu(gpuid):
     booklist = get_reservation_status()
     for book in booklist:
-        if book["gpuid"] == gpu_name:
+        if book["gpuid"] == gpuid:
             return book["username"]
     return ""
 
 
-def when_finish_reserve(gpu_name):
+def when_finish_reserve(gpuid):
     booklist = get_reservation_status()
     for book in booklist:
-        if book["gpuid"] == gpu_name:
-            return book["usagetime"]
+        if book["gpuid"] == gpuid:
+            return book["finishtime"]
     return ""
 
 
-def is_reserved(gpu_name):
+def is_reserved(gpuid):
     booklist = get_reservation_status()
     for book in booklist:
-        if book["gpuid"] == gpu_name:
+        if book["gpuid"] == gpuid:
             return "bg-danger"
     return "bg-primary"
+
+
+def check_deadline(now):
+    booklist = get_reservation_status()
+    is_time_over_gpus = []
+    for book in booklist:
+        finish_time = book["finishtime"]
+        finish_time = datetime.strptime(finish_time, "%m/%d %H:%M").replace(year=now.year)
+        if finish_time <= now:
+            is_time_over_gpus.append(book["gpuid"])
+    return is_time_over_gpus
