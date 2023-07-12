@@ -77,7 +77,7 @@ def my_gpustat():
         return {"error": f'{getattr(e, "message", str(e))}!'}
 
 
-def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
+def all_gpustats(hosts=None, ttl=20, retry=1, timeout=1):
     """
     Aggregates the gpustats of all registered hosts and this host.
 
@@ -93,6 +93,7 @@ def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
     for host in hosts:
         if host["display"]:
             gpustat = client.get(host["name"])
+            # gpustat = None
             if gpustat is None:
                 gpustat = req_host(host, ttl, retry, timeout)
             else:
