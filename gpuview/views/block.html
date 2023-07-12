@@ -1,4 +1,4 @@
-% gpu_id = f"{gpustat.get('hostname')}_GPU{gpu.get('index')}"
+{% set gpu_id = gpustat.get('hostname') ~ "_GPU" ~ gpu.get('index') %}
 <div class="col-xl-3 col-md-4 col-sm-6 mb-3 card-block {{gpustat['hostname']}}"
     style="display:{{ 'none' if not gpustat.get('display') else 'grid' }}">
     <div class="card text-white {{ core.is_reserved(gpu_id) }} o-hidden h-100" id="{{gpu_id}}"
