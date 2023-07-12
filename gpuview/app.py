@@ -5,7 +5,6 @@ Web API of gpuview.
 @url https://github.com/fgaim
 """
 
-import json
 import os
 from datetime import datetime, timedelta
 
@@ -47,10 +46,7 @@ def index():
 def _index():
     hosts = core.load_hosts()
     for host in hosts:
-        if host["name"] not in request.args:
-            host["display"] = False
-        else:
-            host["display"] = True
+        host["display"] = host["name"] in request.args
     hosts, gpustats = core.all_gpustats(hosts)
     booklist = core.get_reservation_status()
     now = datetime.now()
@@ -67,11 +63,7 @@ def report_gpustat():
     Returns the gpustat of this host.
         See `exclude-self` option of `gpuview run`.
     """
-    response = {}
-    if EXCLUDE_SELF:
-        resp = {"error": "Excluded self!"}
-    else:
-        resp = core.my_gpustat()
+    resp = {"error": "Excluded self!"} if EXCLUDE_SELF else core.my_gpustat()
     return jsonify(resp)
 
 
@@ -97,10 +89,7 @@ def cancel_gpu():
 def host_display():
     hosts = core.load_hosts()
     for host in hosts:
-        if host["name"] not in request.args:
-            host["display"] = False
-        else:
-            host["display"] = True
+        host["display"] = host["name"] in request.args
     hosts, _ = core.all_gpustats(hosts)
     core.save_hosts(hosts)
     return redirect("/")
@@ -120,23 +109,23 @@ def main():
     parser = utils.arg_parser()
     args = parser.parse_args()
 
-    if "run" == args.action:
+    if args.action == "run":
         core.safe_zone(args.safe_zone)
         global EXCLUDE_SELF
         EXCLUDE_SELF = args.exclude_self
         app.run(host=args.host, port=args.port, debug=args.debug)
-    elif "service" == args.action:
+    elif args.action == "service":
         core.install_service(
             host=args.host,
             port=args.port,
             safe_zone=args.safe_zone,
             exclude_self=args.exclude_self,
         )
-    elif "add" == args.action:
+    elif args.action == "add":
         core.add_host(args.url, args.name)
-    elif "remove" == args.action:
+    elif args.action == "remove":
         core.remove_host(args.name)
-    elif "hosts" == args.action:
+    elif args.action == "hosts":
         core.print_hosts()
     else:
         parser.print_help()

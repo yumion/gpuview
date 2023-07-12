@@ -22,7 +22,7 @@ class _HelpAction(argparse._HelpAction):
         ]
         for subparsers_action in subparsers_actions:
             for choice, subparser in subparsers_action.choices.items():
-                print("Subparser '{}'".format(choice))
+                print(f"Subparser '{choice}'")
                 print(subparser.format_help())
         parser.exit()
 
@@ -35,7 +35,7 @@ def arg_parser():
         "--version",
         action="version",
         help="Print gpuview and gpustat versions",
-        version="gpuview %s || gpustat %s" % (__version__, __gpustat__),
+        version=f"gpuview {__version__} || gpustat {__gpustat__}",
     )
     parser.add_argument(
         "-h", "--help", action=_HelpAction, help="Print this help message"

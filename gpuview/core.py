@@ -37,8 +37,6 @@ def my_gpustat():
     Returns a [safe] version of gpustat for this host.
         # See `--safe-zone` option of `gpuview start`.
         # Omit sensitive details, eg. uuid, username, and processes.
-        # Set color flag based on gpu temperature:
-            # bg-warning, bg-danger, bg-success, bg-primary
 
     Returns:
         dict: gpustat
@@ -56,27 +54,19 @@ def my_gpustat():
                 delete_list.append(gpu_id)
                 continue
             gpu["memory"] = round(float(gpu["memory.used"]) / float(gpu["memory.total"]) * 100)
+            gpu["users"] = len({p["username"] for p in gpu["processes"]})
             if SAFE_ZONE:
-                gpu["users"] = len(set([p["username"] for p in gpu["processes"]]))
                 user_process = [
-                    "%s(%s,%sM)" % (p["username"], p["command"], p["gpu_memory_usage"]) for p in gpu["processes"]
+                    f'{p["username"]}({p["command"]},{p["gpu_memory_usage"]}M)'
+                    for p in gpu["processes"]
                 ]
                 gpu["user_processes"] = " ".join(user_process)
             else:
-                gpu["users"] = len(set([p["username"] for p in gpu["processes"]]))
                 processes = len(gpu["processes"])
-                gpu["user_processes"] = "%s/%s" % (gpu["users"], processes)
+                gpu["user_processes"] = f'{gpu["users"]}/{processes}'
                 gpu.pop("processes", None)
                 gpu.pop("uuid", None)
                 gpu.pop("query_time", None)
-
-            gpu["flag"] = "bg-primary"
-            # if gpu["memory"] > 75:
-            #     gpu["flag"] = "bg-danger"
-            # elif gpu["memory"] > 50:
-            #     gpu["flag"] = "bg-warning"
-            # elif gpu["memory"] > 10:
-            #     gpu["flag"] = "bg-success"
 
         if delete_list:
             for gpu_id in delete_list:
@@ -84,18 +74,7 @@ def my_gpustat():
         stat["display"] = True
         return stat
     except Exception as e:
-        return {"error": "%s!" % getattr(e, "message", str(e))}
-
-
-def reset_flag(gpustat):
-    for gpu_id, gpu in enumerate(gpustat["gpus"]):
-        gpu["flag"] = "bg-primary"
-        if gpu["memory"] > 75:
-            gpu["flag"] = "bg-danger"
-        elif gpu["memory"] > 50:
-            gpu["flag"] = "bg-warning"
-        elif gpu["memory"] > 10:
-            gpu["flag"] = "bg-success"
+        return {"error": f'{getattr(e, "message", str(e))}!'}
 
 
 def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
@@ -126,20 +105,21 @@ def all_gpustats(hosts=None, ttl=20, retry=3, timeout=3):
 
 
 def req_host(host, ttl, retry, timeout):
-    for i in range(retry):
+    for _ in range(retry):
         try:
             raw_resp = urlopen(host["url"] + "/gpustat", timeout=timeout)
             resp = raw_resp.read()
             if type(resp) != str:
                 resp = resp.decode()
             gpustat = json.loads(resp)
-            # reset_flag(gpustat)
             raw_resp.close()
             if gpustat is not None and "gpus" in gpustat:
                 client.set(host["name"], json.dumps(gpustat), ttl)
             return gpustat
         except Exception as e:
-            print("Error: %s getting gpustat from %s" % (getattr(e, "message", str(e)), host["url"]))
+            print(
+                f'Error: {getattr(e, "message", str(e))} getting gpustat from {host["url"]}'
+            )
     return None
 
 
@@ -161,7 +141,7 @@ def load_hosts():
             name, url, display = line.strip().split(",")
             hosts.append({"name": name, "url": url, "display": str2bool(display)})
         except Exception as e:
-            print("Error: %s loading host: %s!" % (getattr(e, "message", str(e)), line))
+            print(f'Error: {getattr(e, "message", str(e))} loading host: {line}!')
     return hosts
 
 
@@ -187,9 +167,9 @@ def remove_host(name):
     names = [host["name"] for host in hosts]
     if hosts.pop(names.index(name)):
         save_hosts(hosts)
-        print("Removed host: %s!" % name)
+        print(f"Removed host: {name}!")
     else:
-        print("Couldn't find host: %s!" % name)
+        print(f"Couldn't find host: {name}!")
 
 
 def print_hosts():
@@ -204,15 +184,15 @@ def print_hosts():
 def install_service(host=None, port=None, safe_zone=False, exclude_self=False):
     arg = ""
     if host is not None:
-        arg += "--host %s " % host
+        arg += f"--host {host} "
     if port is not None:
-        arg += "--port %s " % port
+        arg += f"--port {port} "
     if safe_zone:
         arg += "--safe-zone "
     if exclude_self:
         arg += "--exclude-self "
     script = os.path.join(ABS_PATH, "service.sh")
-    subprocess.call('{} "{}"'.format(script, arg.strip()), shell=True)
+    subprocess.call(f'{script} "{arg.strip()}"', shell=True)
 
 
 def get_reservation_status():
@@ -225,7 +205,7 @@ def get_reservation_status():
             gpuid, username, finishtime = line.strip().split(",")
             booklist.append({"gpuid": gpuid, "username": username, "finishtime": finishtime})
         except Exception as e:
-            print("Error: %s loading host: %s!" % (getattr(e, "message", str(e)), line))
+            print(f'Error: {getattr(e, "message", str(e))} loading host: {line}!')
     return booklist
 
 
@@ -253,26 +233,24 @@ def cancel_gpu(gpuid):
 
 def who_reserved_gpu(gpuid):
     booklist = get_reservation_status()
-    for book in booklist:
-        if book["gpuid"] == gpuid:
-            return book["username"]
-    return ""
+    return next(
+        (book["username"] for book in booklist if book["gpuid"] == gpuid), ""
+    )
 
 
 def when_finish_reserve(gpuid):
     booklist = get_reservation_status()
-    for book in booklist:
-        if book["gpuid"] == gpuid:
-            return book["finishtime"]
-    return ""
+    return next(
+        (book["finishtime"] for book in booklist if book["gpuid"] == gpuid), ""
+    )
 
 
 def is_reserved(gpuid):
     booklist = get_reservation_status()
-    for book in booklist:
-        if book["gpuid"] == gpuid:
-            return "bg-danger"
-    return "bg-primary"
+    return next(
+        ("bg-danger" for book in booklist if book["gpuid"] == gpuid),
+        "bg-primary",
+    )
 
 
 def check_deadline(now):
