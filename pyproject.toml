@@ -1,19 +1,26 @@
 [tool.poetry]
 name = "gpuview"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["Atsushi Yamada <a.yamada0703@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.6"
 gpustat = "^0.5.0"
 flask = "*"
 pymemcache = "*"
+
+[tool.poetry.dev-dependencies]
 flake8 = "*"
+black = "*"
+isort = "*"
+mypy = "*"
 pytest = "*"
 pytest-cov = "*"
 
+[tool.poetry.scripts]
+gpuview = "gpuview.app:main"
 
 [build-system]
 requires = ["poetry-core"]
