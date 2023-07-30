@@ -1,7 +1,6 @@
-import json
 import time
 
-from gpuview.core import load_hosts, req_host, reset_flag
+from gpuview.core import load_hosts, req_host
 
 
 def get_gpustats(ttl, retry, timeout):

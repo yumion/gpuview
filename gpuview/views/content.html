@@ -2,11 +2,11 @@
     <div class="container-fluid" style="padding: 200px 40px 40px 40px">
         <!-- GPU status card -->
         <div class="row">
-            % for gpustat in gpustats:
-            % for gpu in gpustat.get('gpus', []):
-            % include('block.tpl')
-            % end
-            % end
+            {% for gpustat in gpustats %}
+                {% for gpu in gpustat.get('gpus', []) %}
+                {% include 'block.html' %}
+                {% endfor %}
+            {% endfor %}
         </div>
 
         <!-- List of GPU process -->
@@ -29,21 +29,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            % for gpustat in gpustats:
-                            % for gpu in gpustat.get('gpus', []):
-                            <tr class="small" id={{ gpustat.get('hostname', '-' ) }}>
-                                <th scope="row">{{ gpustat.get('hostname', '-') }} </th>
-                                <td> [{{ gpu.get('index', '') }}] {{ gpu.get('name', '-') }} </td>
-                                <td> {{ gpu.get('temperature.gpu', '-') }}&#8451; </td>
-                                <td> {{ gpu.get('utilization.gpu', '-') }}% </td>
-                                <td> {{ gpu.get('memory', '-') }}%
-                                    ({{ gpu.get('memory.used', '') }}/{{ gpu.get('memory.total', '-') }}) </td>
-                                <td> {{ gpu.get('power.draw', '-') }} / {{ gpu.get('enforced.power.limit', '-') }} W
-                                </td>
-                                <td> {{ gpu.get('user_processes', '-') }} </td>
-                            </tr>
-                            % end
-                            % end
+                            {% for gpustat in gpustats %}
+                                {% for gpu in gpustat.get('gpus', []) %}
+                                <tr class="small" id={{ gpustat.get('hostname', '-' ) }}>
+                                    <th scope="row">{{ gpustat.get('hostname', '-') }} </th>
+                                    <td> [{{ gpu.get('index', '') }}] {{ gpu.get('name', '-') }} </td>
+                                    <td> {{ gpu.get('temperature.gpu', '-') }}&#8451; </td>
+                                    <td> {{ gpu.get('utilization.gpu', '-') }}% </td>
+                                    <td> {{ gpu.get('memory', '-') }}%
+                                        ({{ gpu.get('memory.used', '') }}/{{ gpu.get('memory.total', '-') }}) </td>
+                                    <td> {{ gpu.get('power.draw', '-') }} / {{ gpu.get('enforced.power.limit', '-') }} W
+                                    </td>
+                                    <td> {{ gpu.get('user_processes', '-') }} </td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -105,48 +105,6 @@
             gpuIdInputEl.setAttribute("value", element.id);
         }
     }
-
-    // // 予約モーダル内のフォームの送信イベントリスナー
-    // reservationForm.addEventListener("submit", function (event) {
-    //     event.preventDefault(); // フォームのデフォルトの送信をキャンセル
-    //     // フォームの入力値を取得
-    //     const username = reservationForm.querySelector("#username").value;
-    //     const usagetime = reservationForm.querySelector("#usagetime").value;
-    //     const gpuId = reservationForm.querySelector("#gpuId").value;
-    //     // 選択したカードを取得
-    //     const gpuCard = document.getElementById(gpuId);
-    //     // モーダルを閉じる
-    //     reservationModal.style.display = "none";
-    //     // フォームをリセット
-    //     reservationForm.reset();
-    //     // TODO:DBからDBから取ってくるようにして後で消す
-    //     // 予約ボタンをキャンセルボタンに変更
-    //     gpuCard.classList.remove("bg-primary");
-    //     gpuCard.classList.add("bg-danger");
-    //     // 予約情報の表示
-    //     reservationInfo.textContent = "Username: " + username + ", Usage Time: " + usagetime;
-    //     // 改めてsubmit
-    //     reservationForm.submit();
-    // });
-
-    // // キャンセルモーダルのフォームの送信イベントリスナー
-    // cancelForm.addEventListener("submit", function (event) {
-    //     // event.preventDefault(); // フォームのデフォルトの送信をキャンセル
-    //     // フォームの入力値を取得
-    //     const gpuId = reservationForm.querySelector("#gpuId").value;
-    //     // 選択したカードを取得
-    //     const gpuCard = document.getElementById(gpuId);
-    //     // モーダルを閉じる
-    //     cancelModal.style.display = "none";
-    //     // TODO:DBからDBから取ってくるようにして後で消す
-    //     // 予約ボタンを予約モードに変更
-    //     gpuCard.classList.remove("bg-danger");
-    //     gpuCard.classList.add("bg-primary");
-    //     // 予約情報をリセット
-    //     reservationInfo.textContent = "";
-    //     // 改めてsubmit
-    //     reservationForm.submit();
-    // });
 
     // Close Reservation Modal
     reservationModal.querySelector(".close").addEventListener("click", () => {
