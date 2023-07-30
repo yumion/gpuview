@@ -8,23 +8,24 @@ gpuview-enhanced
 
 
 GPU is an expensive resource, and deep learning practitioners have to monitor the
-health and usage of their GPUs, such as the temperature, memory, utilization, and the users. 
+health and usage of their GPUs, such as the temperature, memory, utilization, and the users.
 This can be done with tools like `nvidia-smi` and `gpustat` from the terminal or command-line.
-Often times, however, it is not convenient to `ssh` into servers to just check the GPU status. 
-`gpuview` is meant to mitigate this by running a lightweight web dashboard on top of 
-[`gpustat`][repo_gpustat].  
+Often times, however, it is not convenient to `ssh` into servers to just check the GPU status.
+`gpuview` is meant to mitigate this by running a lightweight web dashboard on top of
+[`gpustat`][repo_gpustat].
 
 With `gpuview` one can monitor GPUs on the go, though a web browser. Moreover, **multiple GPU servers** can be registered into one `gpuview` dashboard and all stats are aggregated and accessible from one place.
 
 
-Thumbnail view of GPUs across multiple servers.  
+Thumbnail view of GPUs across multiple servers.
 
 **!New Features in this fork:**
 1. Select and save the multiple GPU servers for display
 2. Memory cache for multiple GPU servers
 3. Page auto refresh with a indicator of time to stale
+4. Add function of reservation of each GPUs
 
-![Screenshot of gpuview](https://github.com/XinNoil/gpuview/blob/main/imgs/dash-1.png)
+![Screenshot of gpuview](imgs/dashboard.png)
 
 
 Setup
@@ -39,7 +40,7 @@ $ pip install git+https://github.com/XinNoil/gpuview.git@main
 $ pip install http://tjunet.top/gitbucket/XinNoil/gpuview-package/archive/master.zip
 ```
 
-> `gpuview` installs the latest version of `gpustat` from `pypi`, therefore, its commands are available 
+> `gpuview` installs the latest version of `gpustat` from `pypi`, therefore, its commands are available
 from the terminal.
 
 Dependendencies
@@ -126,7 +127,7 @@ $ gpuview hosts
 
 > Note: the `gpuview` service needs to run in all hosts that will be monitored.
 
-> Tip: `gpuview` can be setup on a none GPU machine, such as laptops, to monitor remote GPU servers. 
+> Tip: `gpuview` can be setup on a none GPU machine, such as laptops, to monitor remote GPU servers.
 
 
 etc
@@ -136,14 +137,14 @@ Helpful tips related to the underlying performance are available at the [`gpusta
 
 
 For the sake of simplicity, `gpuview` does not have a user authentication in place. As a security measure,
-it does not report sensitive details such as user names by default. This can be changed if the service is 
-running in a trusted network, using the `--safe-zone` option to report all details. 
+it does not report sensitive details such as user names by default. This can be changed if the service is
+running in a trusted network, using the `--safe-zone` option to report all details.
 
 
 The `--exclude-self` option of the run command can be used to prevent other dashboards from getting stats of the current machine. This way the stats are shown only on the host's own dashboard.
 
 
-Detailed view of GPUs across multiple servers.  
+Detailed view of GPUs across multiple servers.
 
 ![Screenshot of gpuview](https://github.com/XinNoil/gpuview/blob/main/imgs/dash-2.png)
 
