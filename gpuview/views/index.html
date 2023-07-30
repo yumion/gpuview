@@ -18,8 +18,6 @@
     <link rel="shortcut icon" href="/static/img/vga-card.png" type="image/x-icon" />
 </head>
 
-% from gpuview import core
-
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav" style="padding-top:40px">
         <img src="/static/img/vga-card.png" width="32" height="32" style="margin-left: 20px;margin-right: 10px;">
@@ -30,16 +28,16 @@
                 <div class="box bg-primary"></div> <label style="color:white"> Vacant </label>
                 <div class="box bg-danger"></div> <label style="color:white"> Occupied </label>
             </div>
-            <form onsubmit="return handleData()" method="get" action="host_display" id="hosts_form"
+            <form onsubmit="return handleData()" method="get" action="{{ url_for('host_display') }}" id="hosts_form"
                 style="display: flex; padding-left:20px">
                 <label style="color:white; margin-right:10px"> Server: </label>
-                % for host in hosts:
+                {% for host in hosts %}
                 <div style="margin-right:8px">
                     <input type="checkbox" id={{host['name']}} name={{host['name']}} {{'checked' if host['display']
                         else '' }} class="hosts_form" onclick="user_refresh()">
                     <label for={{host['name']}} style="color:white"> {{host['name']}} </label><br>
                 </div>
-                % end
+                {% endfor %}
                 <div style="color:white">
                     <a class="button button-blue" id="save_button">
                         <strong>Save</strong>
@@ -57,7 +55,7 @@
     <input type="text" id="timeValue" value="0"
         style="display:none; color: red; font-size: 45px; border: none; background: transparent; outline: none; width: 200px; text-align: center;"
         readonly>
-    %include('content.tpl')
+    {% include('content.html') %}
     <footer class="sticky-footer">
         <div class="container">
             <div class="text-center text-white">
