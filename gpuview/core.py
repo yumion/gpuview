@@ -7,8 +7,8 @@ Core functions of gpuview.
 
 import json
 import os
-from datetime import datetime
 import subprocess
+from datetime import datetime
 
 try:
     from urllib.request import urlopen
@@ -54,11 +54,12 @@ def my_gpustat():
                 delete_list.append(gpu_id)
                 continue
             gpu["memory"] = round(float(gpu["memory.used"]) / float(gpu["memory.total"]) * 100)
-            gpu["users"] = len({p["username"] for p in gpu["processes"]})
+            gpu["users"] = len({p["username"] for p in gpu["processes"] if p["username"] != "gdm"})
             if SAFE_ZONE:
                 user_process = [
                     f'{p["username"]}({p["command"]},{p["gpu_memory_usage"]}M)'
                     for p in gpu["processes"]
+                    if p["username"] != "gdm"
                 ]
                 gpu["user_processes"] = " ".join(user_process)
             else:
@@ -118,9 +119,7 @@ def req_host(host, ttl, retry, timeout):
                 client.set(host["name"], json.dumps(gpustat), ttl)
             return gpustat
         except Exception as e:
-            print(
-                f'Error: {getattr(e, "message", str(e))} getting gpustat from {host["url"]}'
-            )
+            print(f'Error: {getattr(e, "message", str(e))} getting gpustat from {host["url"]}')
     return None
 
 
@@ -234,16 +233,12 @@ def cancel_gpu(gpuid):
 
 def who_reserved_gpu(gpuid):
     booklist = get_reservation_status()
-    return next(
-        (book["username"] for book in booklist if book["gpuid"] == gpuid), ""
-    )
+    return next((book["username"] for book in booklist if book["gpuid"] == gpuid), "")
 
 
 def when_finish_reserve(gpuid):
     booklist = get_reservation_status()
-    return next(
-        (book["finishtime"] for book in booklist if book["gpuid"] == gpuid), ""
-    )
+    return next((book["finishtime"] for book in booklist if book["gpuid"] == gpuid), "")
 
 
 def is_reserved(gpuid):

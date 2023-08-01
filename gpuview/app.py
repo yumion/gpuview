@@ -19,7 +19,6 @@ from flask import (
 
 from . import core, utils
 
-
 abs_path = os.path.dirname(os.path.realpath(__file__))
 abs_views_path = os.path.join(abs_path, "views")
 app = Flask(__name__, template_folder=abs_views_path)
@@ -54,7 +53,9 @@ def _index():
     for gpuid in is_time_over_gpus:
         core.cancel_gpu(gpuid)
     timestamp = now.strftime("Updated at %Y/%m/%d %H:%M:%S")
-    return render_template("content.html", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=timestamp)
+    return render_template(
+        "content.html", hosts=hosts, gpustats=gpustats, booklist=booklist, update_time=timestamp, core=core
+    )
 
 
 @app.route("/gpustat", methods=["GET"])
