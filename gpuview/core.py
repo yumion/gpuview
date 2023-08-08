@@ -119,7 +119,7 @@ def req_host(host, ttl, retry, timeout):
                 client.set(host["name"], json.dumps(gpustat), ttl)
             return gpustat
         except Exception as e:
-            print(f'Error: {getattr(e, "message", str(e))} getting gpustat from {host["url"]}')
+            print(f'Error: {getattr(e, "message", str(e))} getting gpustat from {host["name"]}')
     return None
 
 
