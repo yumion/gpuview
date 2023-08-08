@@ -31,27 +31,55 @@ Thumbnail view of GPUs across multiple servers.
 Setup
 -----
 
-Python is required,`gpuview` has been tested with both 2.7 and 3 versions.
+Python and Poetry are required,`gpuview` has been tested with 3.6.9 and upper versions.
 
-Install directly from repo:
+Install:
 
 ```
-$ pip install git+https://github.com/XinNoil/gpuview.git@main
-$ pip install http://tjunet.top/gitbucket/XinNoil/gpuview-package/archive/master.zip
+$ git clone https://github.com/yumion/gpuview.git
+$ cd gpuview
+$ poetry install
 ```
 
-> `gpuview` installs the latest version of `gpustat` from `pypi`, therefore, its commands are available
-from the terminal.
+- Trouble shooting
+    - `Failed to unlock the collection!` at poetry install.
+      ```
+      $ keyring --disable
+      ```
+    - `Keyring config exists only in the old location /home/USER/.local/share/python_keyring/keyringrc.cfg and should be moved to /home/USER/.config/python_keyring/keyringrc.cfg to work with this version of keyring.`  at poetry install
+      ```
+      $ mv ~/.local/share/python_keyring ~/.config/
+      ``` 
 
 Dependendencies
 ---------------
 
+- poetry 
+  ```
+  $ curl -sSL https://install.python-poetry.org | python3 -
+  ```
+    - If you occur no matching version error, set option `--version`
+      ```
+      $ curl -sSL https://install.python-poetry.org | python3 - --version 1.2.0a2
+      ```
+
+
+- memcached
 ```
 $ sudo apt-get install memcached
 ```
 
+
 Usage
 -----
+
+- Stand up command script is here
+  ```
+  $ bash poetry_run.sh
+  ```
+- If you use just API, comment out `--exclude-self` in `poetry_run.sh`
+
+---
 
 `gpuview` can be used in two modes as a temporary process or as a background service.
 
