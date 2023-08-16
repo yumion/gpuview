@@ -37,7 +37,7 @@
                                     <td> {{ gpu.get('temperature.gpu', '-') }}&#8451; </td>
                                     <td> {{ gpu.get('utilization.gpu', '-') }}% </td>
                                     <td> {{ gpu.get('memory', '-') }}%
-                                        ({{ gpu.get('memory.used', '') }}/{{ gpu.get('memory.total', '-') }}) </td>
+                                        ({{ gpu.get('memory.used', '') }}/{{ gpu.get('memory.total', '-') }} GB) </td>
                                     <td> {{ gpu.get('power.draw', '-') }} / {{ gpu.get('enforced.power.limit', '-') }} W
                                     </td>
                                     <td> {{ gpu.get('user_processes', '-') }} </td>

@@ -53,13 +53,17 @@ def my_gpustat():
             if type(gpu["processes"]) is str:
                 delete_list.append(gpu_id)
                 continue
+            # MB to GB
+            gpu["memory.used"] = f'{float(gpu["memory.used"]) / 1024:.0f}'  # [GB]
+            gpu["memory.total"] = f'{float(gpu["memory.total"]) / 1024:.0f}'  # [GB]
+            # memory rate
             gpu["memory"] = round(float(gpu["memory.used"]) / float(gpu["memory.total"]) * 100)
             gpu["users"] = len({p["username"] for p in gpu["processes"] if p["username"] != "gdm"})
             if SAFE_ZONE:
                 user_process = [
                     f'{p["username"]}({p["command"]},{p["gpu_memory_usage"]}M)'
                     for p in gpu["processes"]
-                    if p["username"] != "gdm"
+                    if p["username"] != "gdm"  # ignore GUI process
                 ]
                 gpu["user_processes"] = " ".join(user_process)
             else:
