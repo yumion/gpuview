@@ -61,7 +61,7 @@ def my_gpustat():
             gpu["users"] = len({p["username"] for p in gpu["processes"] if p["username"] != "gdm"})
             if SAFE_ZONE:
                 user_process = [
-                    f'{p["username"]}({p["command"]},{p["gpu_memory_usage"]}M)'
+                    f'{p["username"]}({p["command"]},{p["pid"]})'
                     for p in gpu["processes"]
                     if p["username"] != "gdm"  # ignore GUI process
                 ]
