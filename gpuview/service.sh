@@ -4,6 +4,7 @@ echo 'Install gpuview service:'
 
 user=$USER
 app_dir=/home/${user}/gpuview
+option_cmd=${@:1}
 
 echo ''
 echo 'Installing supervisor...'
@@ -19,7 +20,7 @@ sudo echo "[program:gpuview]
 user = ${user}
 environment = HOME=\"/home/${user}\",USER=\"${user}\"
 directory = ${app_dir}
-command = bash poetry_run.sh ${1}
+command = bash poetry_run.sh ${option_cmd}
 autostart = true
 autorestart = true
 stderr_logfile = ${log_path}/stderr.log

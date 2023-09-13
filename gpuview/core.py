@@ -58,12 +58,12 @@ def my_gpustat():
             gpu["memory.total"] = f'{float(gpu["memory.total"]) / 1024:.0f}'  # [GB]
             # memory rate
             gpu["memory"] = round(float(gpu["memory.used"]) / float(gpu["memory.total"]) * 100)
-            gpu["users"] = len({p["username"] for p in gpu["processes"] if p["command"] != "Xorg"})
+            gpu["users"] = len({p["username"] for p in gpu["processes"] if p["username"] != "gdm"})
             if SAFE_ZONE:
                 user_process = [
                     f'{p["username"]}({p["command"]},{p["pid"]})'
                     for p in gpu["processes"]
-                    if p["command"] != "Xorg"  # ignore GUI process
+                    if p["username"] != "gdm"  # ignore GUI process
                 ]
                 gpu["user_processes"] = " ".join(user_process)
             else:
